@@ -1,261 +1,381 @@
-WebUntisKalenderExport
+<h1>WebUntisKalenderExport</h1>
 
-ICS-Export als Wochenplan für Familien und Eltern.
+<p><strong>ICS-Export als Wochenplan für Familien und Eltern</strong></p>
 
-Untis iCal-Exporter & Dashboard (v1.0.0)
+<h2>Untis iCal-Exporter &amp; Dashboard (v1.0.0)</h2>
 
-Exportiert Stundenpläne, Hausaufgaben, Mitteilungen und Prüfungen aus WebUntis über ein Python-Skript in .ics-Kalenderdateien.
+<p>
+Exportiert Stundenpläne, Hausaufgaben, Mitteilungen und Prüfungen aus WebUntis
+über ein Python-Skript in <code>.ics</code>-Kalenderdateien.
+</p>
 
-Zusätzlich werden kombinierte Kalenderfeeds (*_alle.ics) erzeugt und über Apache zusammen mit einem Web-Dashboard unter /untis/ bereitgestellt.
+<p>
+Zusätzlich werden kombinierte Kalenderfeeds
+(<code>*_alle.ics</code>) erzeugt und über Apache zusammen mit einem
+Web-Dashboard unter <code>/untis/</code> bereitgestellt.
+</p>
 
-Features
-Export von Stundenplänen
-Export von Hausaufgaben
-Export von Mitteilungen
-Export von Prüfungen (falls in WebUntis verfügbar)
-Erzeugung kombinierter Kalenderfeeds (*_alle.ics)
-Unterstützung mehrerer Schulen und WebUntis-Instanzen
-Automatische Aktualisierung per Cronjob
-Web-Dashboard mit Wochenansicht
-Kalender-Abonnement für Outlook, Apple Kalender, Google Kalender und Smartphones
-Verzeichnisstruktur
-Pfad	Beschreibung
-/opt/untis-ical/untis_to_ical.py	Hauptskript für WebUntis-Abruf und ICS-Erzeugung
-/opt/untis-ical/config.json	Zugangsdaten, Profile, Zeitraum und Ausgabeziel
-/opt/untis-ical/untis-ical.log	Laufzeit- und Cron-Log
-/var/www/html/untis/index.html	Web-Dashboard
-/var/www/html/untis/children.json	Öffentliches Profil-Manifest
-/var/www/html/untis/<slug>.ics	Stundenplan
-/var/www/html/untis/<slug>_hausaufgaben.ics	Hausaufgaben
-/var/www/html/untis/<slug>_mitteilungen.ics	Mitteilungen
-/var/www/html/untis/<slug>_pruefungen.ics	Prüfungen
-/var/www/html/untis/<slug>_alle.ics	Kombinierter Gesamtkalender
-Gesamtkalender (*_alle.ics)
+<hr>
 
-Der kombinierte Kalender enthält:
+<h2>🚀 Features</h2>
 
-Stundenplan
-Hausaufgaben
-Mitteilungen
-Prüfungen
+<ul>
+    <li>Export von Stundenplänen</li>
+    <li>Export von Hausaufgaben</li>
+    <li>Export von Mitteilungen</li>
+    <li>Export von Prüfungen (falls verfügbar)</li>
+    <li>Erzeugung kombinierter Kalenderfeeds (<code>*_alle.ics</code>)</li>
+    <li>Unterstützung mehrerer Schulen und WebUntis-Instanzen</li>
+    <li>Automatische Aktualisierung per Cronjob</li>
+    <li>Web-Dashboard mit Wochenansicht</li>
+    <li>Kalender-Abonnement für Outlook, Apple Kalender, Google Kalender und Smartphones</li>
+</ul>
 
-Zur Kennzeichnung werden folgende Präfixe verwendet:
+<hr>
 
-Typ	Präfix
-Hausaufgaben	[HA]
-Mitteilungen	[Info]
-Prüfungen	[Prüfung]
+<h2>📁 Verzeichnisstruktur</h2>
 
-Zusätzlich erfolgt eine UID-basierte Deduplizierung, damit Termine nicht mehrfach erscheinen.
+<table>
+<tr>
+<th>Pfad</th>
+<th>Beschreibung</th>
+</tr>
 
-Setup & Berechtigungen
-Backend
+<tr>
+<td><code>/opt/untis-ical/untis_to_ical.py</code></td>
+<td>Hauptskript für WebUntis-Abruf und ICS-Erzeugung</td>
+</tr>
 
-Verzeichnis:
+<tr>
+<td><code>/opt/untis-ical/config.json</code></td>
+<td>Zugangsdaten, Profile, Zeitraum und Ausgabeziel</td>
+</tr>
 
-/opt/untis-ical/
+<tr>
+<td><code>/opt/untis-ical/untis-ical.log</code></td>
+<td>Laufzeit- und Cron-Log</td>
+</tr>
 
+<tr>
+<td><code>/var/www/html/untis/index.html</code></td>
+<td>Web-Dashboard</td>
+</tr>
 
-Benötigt:
+<tr>
+<td><code>/var/www/html/untis/children.json</code></td>
+<td>Öffentliches Profil-Manifest</td>
+</tr>
 
-Python 3
-icalendar
-requests
-weitere projektspezifische Abhängigkeiten
+<tr>
+<td><code>/var/www/html/untis/&lt;slug&gt;.ics</code></td>
+<td>Stundenplan</td>
+</tr>
 
-Installation der Standard-Abhängigkeiten:
+<tr>
+<td><code>/var/www/html/untis/&lt;slug&gt;_hausaufgaben.ics</code></td>
+<td>Hausaufgaben</td>
+</tr>
 
-Shell
-pip install icalendar requests
-Webserver
+<tr>
+<td><code>/var/www/html/untis/&lt;slug&gt;_mitteilungen.ics</code></td>
+<td>Mitteilungen</td>
+</tr>
 
-Verzeichnis:
+<tr>
+<td><code>/var/www/html/untis/&lt;slug&gt;_pruefungen.ics</code></td>
+<td>Prüfungen</td>
+</tr>
 
-/var/www/html/untis/
+<tr>
+<td><code>/var/www/html/untis/&lt;slug&gt;_alle.ics</code></td>
+<td>Kombinierter Gesamtkalender</td>
+</tr>
+</table>
 
+<hr>
 
-Bereitstellung über Apache unter:
+<h2>📅 Gesamtkalender (*_alle.ics)</h2>
 
-/untis/
+<p>Der kombinierte Kalender enthält:</p>
 
-Dateirechte
+<ul>
+<li>Stundenplan</li>
+<li>Hausaufgaben</li>
+<li>Mitteilungen</li>
+<li>Prüfungen</li>
+</ul>
 
-Dateien:
+<p>Zur Unterscheidung werden folgende Präfixe verwendet:</p>
 
-0644 (-rw-r--r--)
+<table>
+<tr>
+<th>Typ</th>
+<th>Präfix</th>
+</tr>
+<tr>
+<td>Hausaufgaben</td>
+<td><code>[HA]</code></td>
+</tr>
+<tr>
+<td>Mitteilungen</td>
+<td><code>[Info]</code></td>
+</tr>
+<tr>
+<td>Prüfungen</td>
+<td><code>[Prüfung]</code></td>
+</tr>
+</table>
 
+<p>
+Zusätzlich erfolgt eine UID-basierte Deduplizierung, damit Termine
+nicht mehrfach erscheinen.
+</p>
 
-Verzeichnisse:
+<hr>
 
-0755 (drwxr-xr-x)
+<h2>⚙️ Setup &amp; Berechtigungen</h2>
 
+<h3>Backend</h3>
 
-Dadurch kann Apache sämtliche .html, .ics und .json Dateien lesen.
+<p><strong>Verzeichnis</strong></p>
 
-Manueller Testlauf
-Shell
-PYTHONPATH=/opt/untis-ical \
+<pre><code>/opt/untis-ical/</code></pre>
+
+<p><strong>Benötigt</strong></p>
+
+<ul>
+<li>Python 3</li>
+<li>icalendar</li>
+<li>requests</li>
+<li>weitere projektspezifische Abhängigkeiten</li>
+</ul>
+
+<p><strong>Installation</strong></p>
+
+<pre><code>pip install icalendar requests</code></pre>
+
+<h3>Webserver</h3>
+
+<pre><code>/var/www/html/untis/</code></pre>
+
+<p>Bereitstellung über Apache unter:</p>
+
+<pre><code>/untis/</code></pre>
+
+<h3>Dateirechte</h3>
+
+<p>Dateien:</p>
+
+<pre><code>0644 (-rw-r--r--)</code></pre>
+
+<p>Verzeichnisse:</p>
+
+<pre><code>0755 (drwxr-xr-x)</code></pre>
+
+<hr>
+
+<h2>🧪 Manueller Testlauf</h2>
+
+<pre><code>PYTHONPATH=/opt/untis-ical \
 UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json \
 python3 -u /opt/untis-ical/untis_to_ical.py
- 
-Konfiguration
+</code></pre>
 
-Die Konfiguration erfolgt über:
+<hr>
 
-/opt/untis-ical/config.json
+<h2>🔧 Konfiguration</h2>
 
-Unterstützte Profiltypen
-children
+<p>Die Konfiguration erfolgt über:</p>
 
-Normale Schülerprofile.
+<pre><code>/opt/untis-ical/config.json</code></pre>
 
-children_other_school
+<h3>Unterstützte Profiltypen</h3>
 
-Profile auf anderen WebUntis-Instanzen.
+<h4>children</h4>
 
-Beispielsweise:
+<p>Normale Schülerprofile.</p>
 
-lasker-schule-veseli-schule.webuntis.com
-thalia-grundschule.webuntis.com
-Zeitraumsteuerung
+<h4>children_other_school</h4>
 
-Über folgende Parameter wird festgelegt, wie viele Wochen zurück bzw. voraus geladen werden:
+<p>Profile auf anderen WebUntis-Instanzen.</p>
 
-JSON
-{
-"include_weeks_back": 6,
-"weeks_ahead": 12
-}
+<p>Beispiele:</p>
 
-Beispiel:
+<ul>
+<li>lasker-schule-veseli-schule.webuntis.com</li>
+<li>thalia-grundschule.webuntis.com</li>
+</ul>
 
-6 Wochen rückwirkend
-12 Wochen in die Zukunft
-Prüfungen
+<h3>Zeitraumsteuerung</h3>
 
-Prüfungen werden über folgenden Endpunkt abgefragt:
+<pre><code>{
+  "include_weeks_back": 6,
+  "weeks_ahead": 12
+}</code></pre>
 
-/api/exams
+<h3>Prüfungen</h3>
 
+<p>Verwendeter Endpunkt:</p>
 
-Besonderheiten:
+<pre><code>/api/exams</code></pre>
 
-Kein einschränkender studentId-Filter
-Vollständige Prüfungsliste des jeweiligen Schülers
-Schulen ohne aktiviertes Prüfungsmodul liefern 403 Forbidden
+<ul>
+<li>Kein einschränkender <code>studentId</code>-Filter</li>
+<li>Vollständige Prüfungsliste des jeweiligen Schülers</li>
+<li>403 Forbidden wird lediglich als DEBUG protokolliert</li>
+</ul>
 
-Dieser Fall wird lediglich als DEBUG-Eintrag protokolliert und nicht als Fehler behandelt.
+<hr>
 
-Automatischer Betrieb
+<h2>⏰ Automatischer Betrieb</h2>
+
+<h3>Cronjob</h3>
+
+<pre><code>*/20 * * * * PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json python3 -u /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&amp;1
+</code></pre>
+
+<hr>
+
+<h2>📊 Logging &amp; Monitoring</h2>
+
+<h3>Letzte Logeinträge</h3>
+
+<pre><code>tail -n 30 /opt/untis-ical/untis-ical.log</code></pre>
+
+<h3>Anzahl exportierter Termine</h3>
+
+<pre><code>grep -c "BEGIN:VEVENT" /var/www/html/untis/*.ics</code></pre>
+
+<h3>Apache-Erreichbarkeit</h3>
+
+<pre><code>curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/untis/</code></pre>
+
+<hr>
+
+<h2>🖥️ Web-Dashboard</h2>
+
+<p>
+Die Weboberfläche lädt ihre Daten dynamisch aus
+<code>children.json</code> und den jeweiligen ICS-Dateien.
+</p>
+
+<h3>Funktionen</h3>
+
+<h4>Kind-Auswahl</h4>
+
+<ul>
+<li>Wechsel zwischen mehreren Kindern</li>
+<li>Dynamische Profilumschaltung</li>
+</ul>
+
+<h4>Wochen-Navigation</h4>
+
+<ul>
+<li>Vorherige Woche</li>
+<li>Aktuelle Woche</li>
+<li>Nächste Woche</li>
+</ul>
+
+<h4>Stundenplan-Grid</h4>
+
+<ul>
+<li>Unterricht</li>
+<li>Vertretungen</li>
+<li>Ausfälle</li>
+<li>Prüfungen</li>
+</ul>
+
+<p>Prüfungen werden aus:</p>
+
+<pre><code>&lt;slug&gt;_pruefungen.ics</code></pre>
+
+<p>automatisch übernommen.</p>
+
+<hr>
+
+<h3>Zusatzbereiche</h3>
+
+<h4>Prüfungen</h4>
+<p>Wochenübersicht aller Prüfungen.</p>
+
+<h4>Hausaufgaben</h4>
+<p>Übersicht aller fälligen Aufgaben.</p>
+
+<h4>Mitteilungen</h4>
+<p>Anzeige aktueller Mitteilungen inklusive Umschalter für sämtliche Meldungen.</p>
+
+<hr>
+
+<h2>📲 Kalender-Abonnement</h2>
+
+<p>Bereitgestellter Feed:</p>
+
+<pre><code>/untis/&lt;slug&gt;_alle.ics</code></pre>
+
+<ul>
+<li>Kalender herunterladen</li>
+<li>Kalender direkt öffnen</li>
+<li>Kalender abonnieren</li>
+<li>Abo-URL kopieren</li>
+</ul>
+
+<hr>
+
+<h2>🔄 Ablauf</h2>
+
+<pre><code>
 Cronjob
-
-Aktualisierung alle 20 Minuten:
-
-JSON
-cron wird nicht vollständig unterstützt. Die Syntaxhervorhebung basiert auf JSON.
-*/20 * * * * PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json python3 -u /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&1
- 
-Logging & Monitoring
-Letzte Logeinträge anzeigen
-Shell
-tail -n 30 /opt/untis-ical/untis-ical.log
-Anzahl exportierter Termine prüfen
-Shell
-grep -c "BEGIN:VEVENT" /var/www/html/untis/*.ics
-Apache-Erreichbarkeit prüfen
-Shell
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/untis/
-Web-Dashboard
-
-Die Weboberfläche lädt ihre Daten dynamisch aus children.json und den jeweiligen ICS-Dateien des ausgewählten Kindes.
-
-Funktionen
-Kind-Auswahl
-Wechsel zwischen mehreren Kindern
-Dynamische Profilumschaltung
-Wochen-Navigation
-Vorherige Woche
-Aktuelle Woche
-Nächste Woche
-Stundenplan-Grid
-
-Anzeige von:
-
-Unterricht
-Vertretungen
-Ausfällen
-Prüfungen
-
-Prüfungen werden automatisch aus
-
-<slug>_pruefungen.ics
-
-
-geladen und im entsprechenden Zeitfenster dargestellt.
-
-Zusatzbereiche
-Prüfungen
-
-Wochenübersicht aller Prüfungen.
-
-Hausaufgaben
-
-Übersicht aller fälligen Aufgaben.
-
-Mitteilungen
-
-Anzeige aktueller Mitteilungen inklusive Umschalter für sämtliche Meldungen.
-
-Kalender-Abonnement
-
-Für jedes Kind wird ein kombinierter Kalender bereitgestellt:
-
-/untis/<slug>_alle.ics
-
-
-Verfügbare Funktionen:
-
-Kalender herunterladen
-Kalender direkt öffnen
-Kalender abonnieren
-Abo-URL kopieren
-Ablauf
-Plain Text
-Cronjob
-│
-▼
+   │
+   ▼
 WebUntis Login
-│
-▼
+   │
+   ▼
 Abruf von:
 - Stundenplan
 - Hausaufgaben
 - Mitteilungen
 - Prüfungen
-│
-▼
+   │
+   ▼
 Erzeugung einzelner ICS-Dateien
-│
-▼
+   │
+   ▼
 Erzeugung von *_alle.ics
-│
-▼
+   │
+   ▼
 Aktualisierung children.json
-│
-▼
+   │
+   ▼
 Bereitstellung über Apache
-│
-▼
+   │
+   ▼
 Anzeige im Dashboard
-Sicherheit
-Zugangsdaten verbleiben ausschließlich in config.json
-children.json enthält keine Zugangsdaten
-Öffentlich bereitgestellt werden nur Kalenderdaten und Profilinformationen
-Für externe Nutzung wird HTTPS empfohlen
-Lizenz
+</code></pre>
 
+<hr>
+
+<h2>🔐 Sicherheit</h2>
+
+<ul>
+<li>Zugangsdaten verbleiben ausschließlich in <code>config.json</code></li>
+<li><code>children.json</code> enthält keine Zugangsdaten</li>
+<li>Öffentlich bereitgestellt werden nur Kalenderdaten und Profilinformationen</li>
+<li>HTTPS wird empfohlen</li>
+</ul>
+
+<hr>
+
+<h2>📄 Lizenz</h2>
+
+<p>
 Dieses Projekt wird ohne Gewähr bereitgestellt.
+</p>
 
+<p>
 Die Nutzung erfolgt auf eigene Verantwortung.
+</p>
 
-Bitte die Datenschutzrichtlinien der jeweiligen Schule sowie die Nutzungsbedingungen von WebUntis beachten.
+<p>
+Bitte die Datenschutzrichtlinien der jeweiligen Schule sowie
+die Nutzungsbedingungen von WebUntis beachten.
+</p>****
