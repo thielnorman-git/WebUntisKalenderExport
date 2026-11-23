@@ -495,16 +495,6 @@ Anzeige im Dashboard
 
 <hr>
 
-<h2>🔐 Sicherheit</h2>
-
-<ul>
-<li>Zugangsdaten verbleiben ausschließlich in <code>config.json</code></li>
-<li><code>children.json</code> enthält keine Zugangsdaten</li>
-<li>Öffentlich bereitgestellt werden nur Kalenderdaten und Profilinformationen</li>
-<li>HTTPS wird empfohlen</li>
-</ul>
-
-<hr>
 
 <h2>📅 Google Kalender Synchronisierung</h2>
 
