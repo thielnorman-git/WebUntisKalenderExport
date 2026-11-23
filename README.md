@@ -202,10 +202,135 @@ python3 -u /opt/untis-ical/untis_to_ical.py
 <p>Beispiele:</p>
 
 <ul>
-<li>lasker-schule-veseli-schule.webuntis.com</li>
-<li>thalia-grundschule.webuntis.com</li>
+<li>schule.webuntis.com</li>
+<li>andere-schule.webuntis.com</li>
 </ul>
+<hr>
 
+<h3>🔍 Automatische Erkennung der Schüler-ID</h3>
+
+<p>
+In den meisten Fällen müssen <code>element_type</code> und
+<code>element_id</code> nicht manuell angegeben werden.
+Das Skript erkennt diese Werte beim Login automatisch.
+</p>
+
+<p>
+Führe das Skript einmal manuell aus:
+</p>
+
+<pre><code>python3 untis_to_ical.py</code></pre>
+
+<p>
+Im Log werden die von WebUntis zurückgegebenen Werte angezeigt:
+</p>
+
+<pre><code>
+2026-11-23 11:55:18 [INFO] Login erfolgreich für 'Kind 1'
+(personType=5, personId=10188)
+
+2026-11-23 11:55:20 [INFO] Login erfolgreich für 'Kind 2'
+(personType=5, personId=10254)
+
+2026-11-23 11:55:21 [INFO] Login erfolgreich für 'Kind 3'
+(personType=12, personId=7542)
+</code></pre>
+
+<h4>Bedeutung der Werte</h4>
+
+<table>
+<tr>
+<th>Wert</th>
+<th>Bedeutung</th>
+</tr>
+<tr>
+<td><code>personType=5</code></td>
+<td>Schülerkonto</td>
+</tr>
+<tr>
+<td><code>personType≠5</code></td>
+<td>z.&nbsp;B. Elternkonto oder anderer Kontotyp</td>
+</tr>
+<tr>
+<td><code>personId</code></td>
+<td>Interne WebUntis-ID des angemeldeten Benutzers</td>
+</tr>
+</table>
+
+<h4>Normale Schülerkonten</h4>
+
+<p>
+Bei Schülerkonten (<code>personType=5</code>) wird die Schüler-ID
+automatisch verwendet. Eine Konfiguration wie diese genügt:
+</p>
+
+<pre><code>{
+  "name": "Beispiel Kind",
+  "slug": "beispiel-kind",
+  "username": "USERNAME",
+  "password": "PASSWORD"
+}</code></pre>
+
+<p>
+Das Skript verwendet automatisch:
+</p>
+
+<pre><code>
+personType = 5
+personId   = 10188
+</code></pre>
+
+<h4>Elternkonten oder Sonderfälle</h4>
+
+<p>
+Falls WebUntis keinen Schüler direkt anmeldet (z.&nbsp;B. Elternkonto),
+kann ein bestimmtes Kind oder eine Klasse explizit angegeben werden.
+</p>
+
+<pre><code>{
+  "name": "Beispiel Kind",
+  "slug": "beispiel-kind",
+  "server": "andere-schule.webuntis.com",
+  "username": "USERNAME",
+  "password": "PASSWORD",
+  "element_type": 5,
+  "element_id": 12345
+}</code></pre>
+
+<h4>Praxisbeispiel</h4>
+
+<p>
+Im folgenden Beispiel wurde kein Schülerkonto erkannt:
+</p>
+
+<pre><code>
+Login erfolgreich für 'Beispiel Kind'
+(personType=12, personId=7542)
+
+Rufe Timetable ab für 'Beispiel Kind'
+(element.id=511, element.type=1)
+</code></pre>
+
+<p>
+Daher wird die automatische Zuordnung durch folgende Konfiguration
+überschrieben:
+</p>
+
+<pre><code>{
+  "element_type": 1,
+  "element_id": 511
+}</code></pre>
+
+<p>
+Damit wird gezielt das gewünschte WebUntis-Objekt abgefragt,
+anstatt die automatisch erkannte Person-ID zu verwenden.
+</p>
+
+<p>
+<strong>Hinweis:</strong> Für die meisten Nutzer werden
+<code>element_type</code> und <code>element_id</code> nicht benötigt.
+Das Skript funktioniert in der Regel ohne diese Angaben.
+</p>
 <h3>Zeitraumsteuerung</h3>
 
 <pre><code>{
