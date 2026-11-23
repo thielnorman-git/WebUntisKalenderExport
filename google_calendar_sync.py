@@ -41,7 +41,7 @@ TIMEZONE = GOOGLE_CFG.get(
 
 CALENDAR_PREFIX = "WebUntis - "
 
-GOOGLE_OWNER = "Bitte EmailAdresse eintragen!"
+GOOGLE_OWNER = GOOGLE_CFG.get("owner", "").strip()
 
 
 def execute_with_retry(
@@ -154,23 +154,24 @@ def get_or_create_calendar(
 
     try:
 
-        execute_with_retry(
-            service.acl().insert(
-                calendarId=calendar_id,
-                body={
-                    "role": "owner",
-                    "scope": {
-                        "type": "user",
-                        "value": GOOGLE_OWNER
+        if GOOGLE_OWNER:
+            execute_with_retry(
+                service.acl().insert(
+                    calendarId=calendar_id,
+                    body={
+                        "role": "owner",
+                        "scope": {
+                            "type": "user",
+                            "value": GOOGLE_OWNER
+                        }
                     }
-                }
-            ),
-            f"acl-create-{child_name}"
-        )
+                ),
+                f"acl-create-{child_name}"
+            )
 
-        print(
-            f"Freigabe erstellt fuer {GOOGLE_OWNER}"
-        )
+            print(
+                f"Freigabe erstellt fuer {GOOGLE_OWNER}"
+            )
 
     except Exception as exc:
 
@@ -185,6 +186,9 @@ def ensure_calendar_shared(
     service,
     calendar_id
 ):
+
+    if not GOOGLE_OWNER:
+        return
 
     try:
 
