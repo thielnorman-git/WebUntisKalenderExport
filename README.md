@@ -506,6 +506,250 @@ Anzeige im Dashboard
 
 <hr>
 
+<h2>📅 Google Kalender Synchronisierung</h2>
+
+<p>
+Optional können die erzeugten WebUntis-Kalender automatisch mit
+Google Kalender synchronisiert werden.
+</p>
+
+<p>
+Dies ist insbesondere für Dienste sinnvoll, die keine lokalen oder
+nicht öffentlich erreichbaren ICS-Dateien unterstützen.
+</p>
+
+<p>
+Beispielsweise:
+</p>
+
+<ul>
+<li>Daely</li>
+<li>Google Kalender</li>
+<li>Google Nest Hub</li>
+<li>Google Assistant</li>
+<li>Android Kalender</li>
+<li>Familien-Dashboards</li>
+</ul>
+
+<hr>
+
+<h3>🔄 Architektur</h3>
+
+<pre><code>
+WebUntis
+    │
+    ▼
+untis_to_ical.py
+    │
+    ▼
+*_alle.ics
+    │
+    ▼
+google_calendar_sync.py
+    │
+    ▼
+Google Kalender
+
+WebUntis - Kind 1
+WebUntis - Kind 2
+WebUntis - Kind 3
+
+    │
+    ▼
+Daely
+</code></pre>
+
+<hr>
+
+<h3>📂 Benötigte Dateien</h3>
+
+<table>
+<tr>
+<th>Datei</th>
+<th>Beschreibung</th>
+</tr>
+
+<tr>
+<td><code>google_calendar_sync.py</code></td>
+<td>Google Kalender Synchronisation</td>
+</tr>
+
+<tr>
+<td><code>google_sync.json</code></td>
+<td>Google Konfiguration</td>
+</tr>
+
+<tr>
+<td><code>service-account.json</code></td>
+<td>Google Service Account Schlüssel</td>
+</tr>
+
+<tr>
+<td><code>children.json</code></td>
+<td>Profilinformationen der Kinder</td>
+</tr>
+
+<tr>
+<td><code>*_alle.ics</code></td>
+<td>Kombinierte Kalenderdateien</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>⚙️ Konfiguration</h3>
+
+<p>
+Beispiel für <code>google_sync.json</code>:
+</p>
+
+<pre><code>{
+  "google": {
+    "service_account_file": "service-account.json",
+    "delete_missing": true,
+    "timezone": "Europe/Berlin"
+  }
+}</code></pre>
+
+<hr>
+
+<h3>🔑 Google Service Account</h3>
+
+<p>
+Für die Synchronisierung wird ein Google Service Account verwendet.
+Dadurch sind keine Browser-Anmeldung, OAuth-Dialoge oder Benutzer-Tokens erforderlich.
+</p>
+
+<p>
+Erforderliche Schritte:
+</p>
+
+<ol>
+<li>Google Cloud Projekt erstellen</li>
+<li>Google Calendar API aktivieren</li>
+<li>Service Account erstellen</li>
+<li>JSON-Schlüssel herunterladen</li>
+<li>Datei als <code>service-account.json</code> speichern</li>
+<li>Google Kalender für den Service Account freigeben</li>
+</ol>
+
+<hr>
+
+<h3>📆 Kalenderstruktur</h3>
+
+<p>
+Für jedes Kind wird automatisch ein eigener Google Kalender verwendet:
+</p>
+
+<ul>
+<li><code>WebUntis - Kind 1</code></li>
+<li><code>WebUntis - Kind 2</code></li>
+<li><code>WebUntis - Kind 3</code></li>
+</ul>
+
+<p>
+Empfohlen wird eine eigene Farbe pro Kind:
+</p>
+
+<table>
+<tr>
+<th>Kalender</th>
+<th>Beispiel-Farbe</th>
+</tr>
+
+<tr>
+<td>WebUntis - Kind 1</td>
+<td>Blau</td>
+</tr>
+
+<tr>
+<td>WebUntis - Kind 2</td>
+<td>Grün</td>
+</tr>
+
+<tr>
+<td>WebUntis - Kind 3</td>
+<td>Lila</td>
+</tr>
+</table>
+
+<hr>
+
+<h3>📖 Synchronisierte Inhalte</h3>
+
+<p>
+Die Google Kalender enthalten alle Einträge aus den jeweiligen
+<code>*_alle.ics</code>-Dateien:
+</p>
+
+<ul>
+<li>Stundenplan</li>
+<li>Hausaufgaben</li>
+<li>Mitteilungen</li>
+<li>Prüfungen</li>
+</ul>
+
+<hr>
+
+<h3>⏱ Rate-Limit Schutz</h3>
+
+<p>
+Das Synchronisationsskript verwendet automatische Wiederholungen
+(Exponential Backoff) bei Google API Rate-Limits.
+</p>
+
+<p>
+Zusätzlich werden API-Aufrufe künstlich gedrosselt, um die
+Google Calendar API nicht zu überlasten.
+</p>
+
+<hr>
+
+<h3>🕒 Automatische Ausführung</h3>
+
+<p>
+Beispiel-Cronjob:
+</p>
+
+<pre><code>
+*/20 * * * * /opt/untis-ical/venv/bin/python /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&1
+
+*/25 * * * * /opt/untis-ical/venv/bin/python /opt/untis-ical/google_calendar_sync.py >> /opt/untis-ical/google-sync.log 2>&1
+</code></pre>
+
+<p>
+Dadurch werden zunächst die WebUntis-Daten aktualisiert und
+anschließend automatisch nach Google Kalender synchronisiert.
+</p>
+
+<hr>
+
+<h3>🔒 Sicherheit</h3>
+
+<p>
+Folgende Dateien dürfen nicht veröffentlicht werden:
+</p>
+
+<ul>
+<li><code>service-account.json</code></li>
+<li><code>config.json</code></li>
+<li><code>children.json</code></li>
+</ul>
+
+<p>
+Empfohlene Ergänzung für <code>.gitignore</code>:
+</p>
+
+<pre><code>
+service-account.json
+config.json
+children.json
+
+*.ics
+*.log
+</code></pre>
+<hr>
 <h2>📄 Lizenz</h2>
 
 <p>
