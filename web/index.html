@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Untis Wochenplan</title>
+<style>
+:root {
+  --bg: #0f131a;
+  --panel: #171c26;
+  --panel-2: #1e2533;
+  --border: #2c3547;
+  --text: #eef2f7;
+  --muted: #94a3b8;
+  --blue: #2563eb;
+  --cancelled-bg: rgba(239, 68, 68, 0.14);
+  --cancelled-bd: rgba(239, 68, 68, 0.45);
+  --irreg-bg: rgba(245, 158, 11, 0.18);
+  --irreg-bd: rgba(245, 158, 11, 0.55);
+  --reg-bg: rgba(59, 130, 246, 0.18);
+  --reg-bd: rgba(59, 130, 246, 0.45);
+  --hw-bg: rgba(16, 185, 129, 0.16);
+  --hw-bd: rgba(16, 185, 129, 0.45);
+  --msg-bg: rgba(168, 85, 247, 0.15);
+  --msg-bd: rgba(168, 85, 247, 0.45);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+button { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 11px; font-size: 0.88rem; cursor: pointer; }
+button.active { background: var(--blue); border-color: #3b82f6; color: #fff; font-weight: 600; }
+.week-label { font-weight: 600; font-size: 0.92rem; padding: 0 6px; color: #fde68a; white-space: nowrap; }
+main { padding: 14px 16px 28px; max-width: 1500px; margin: 0 auto; }
+.board-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+table.untis { width: 100%; min-width: 860px; border-collapse: collapse; table-layout: fixed; }
+table.untis th, table.untis td { border: 1px solid var(--border); vertical-align: top; padding: 5px; }
+table.untis thead th { background: var(--panel-2); text-align: center; padding: 8px 6px; font-size: 0.88rem; }
+th.time-col, td.time-col { width: 72px; text-align: center; color: var(--muted); font-size: 0.78rem; background: #141922; }
+.allday-row td { background: #151b26; }
+.slot { border-radius: 6px; padding: 5px 6px; margin-bottom: 4px; font-size: 0.78rem; line-height: 1.25; border-left: 3px solid var(--reg-bd); background: var(--reg-bg); }
+.slot:last-child { margin-bottom: 0; }
+.slot.irreg { background: var(--irreg-bg); border-left-color: var(--irreg-bd); }
+.slot.cancelled { background: var(--cancelled-bg); border-left-color: var(--cancelled-bd); opacity: 0.68; }
+.slot.cancelled .subj { text-decoration: line-through; }
+.slot.hw { background: var(--hw-bg); border-left-color: var(--hw-bd); }
+.subj { font-weight: 700; color: #f8fafc; }
+.meta { color: #cbd5e1; font-size: 0.72rem; margin-top: 2px; }
+.panel-box { margin-top: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.panel-box h2 { margin: 0 0 10px; font-size: 0.95rem; }
+.hw-bar h2 { color: #6ee7b7; }
+.msg-bar h2 { color: #d8b4fe; }
+.hw-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.hw-chip { background: var(--hw-bg); border: 1px solid var(--hw-bd); border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; }
+.hw-chip.done { opacity: 0.6; text-decoration: line-through; }
+.slot.exam { background: rgba(245, 158, 11, 0.16); border-left: 3px solid #f59e0b; border-color: rgba(245, 158, 11, 0.45); color: #fde68a; }
+.slot.exam .subj { font-weight: 700; color: #fef3c7; }
+.msg-list { display: grid; gap: 8px; }
+.msg-item { background: var(--msg-bg); border: 1px solid var(--msg-bd); border-radius: 8px; padding: 8px 12px; font-size: 0.84rem; }
+.msg-head { font-weight: 700; color: #f3e8ff; margin-bottom: 4px; }
+.msg-body { color: #e2e8f0; white-space: pre-line; font-size: 0.8rem; }
+.status { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header>
+<div class="group" id="child-tabs"></div>
+<div class="group">
+  <button id="prev-week" type="button">&larr; Woche</button>
+  <span class="week-label" id="week-label"></span>
+  <button id="this-week" type="button">Diese Woche</button>
+  <button id="next-week" type="button">Woche &rarr;</button>
+</div>
+<div class="group" id="combined-feed-box" style="gap:6px;">
+  <a id="combined-ics-link" href="#" download style="display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:6px;background:rgba(59,130,246,0.16);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;text-decoration:none;font-size:0.78rem;font-weight:600;white-space:nowrap;">Gesamtkalender (.ics)</a>
+  <button id="copy-ics-url" type="button" title="Abo-URL in die Zwischenablage kopieren" style="padding:5px 8px;font-size:0.76rem;white-space:nowrap;">URL kopieren</button>
+</div>
+<span class="status" id="status-text">Lade...</span>
+</header>
+<main>
+<div class="board-wrap"><table class="untis" id="untis-grid"></table></div>
+<section class="panel-box hw-bar">
+  <h2>Fällige Hausaufgaben in dieser Woche</h2>
+  <div class="hw-list" id="hw-week-list"></div>
+</section>
+<section class="panel-box exam-bar">
+  <h2>Prüfungen &amp; Leistungsnachweise in dieser Woche</h2>
+  <div class="hw-list" id="exam-week-list"></div>
+</section>
+<section class="panel-box msg-bar">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+    <h2 id="msg-heading" style="margin:0;">Mitteilungen in dieser Woche</h2>
+    <button id="toggle-all-msgs" type="button" style="padding:4px 9px;font-size:0.78rem;">Alle Meldungen anzeigen</button>
+  </div>
+  <div class="msg-list" id="msg-list"></div>
+</section>
+</main>
+<script>
+const FALLBACK_CHILDREN = [
+  { slug: "kind1", name: "Kind 1" },
+  { slug: "kind2", name: "Kind 2" }
+];
+const DAY_NAMES = ["Mo", "Di", "Mi", "Do", "Fr"];
+const TIME_SLOTS = [
+  { label: "07:45", start: "07:30", nextStart: "08:00" },
+  { label: "08:00", start: "08:00", nextStart: "08:50" },
+  { label: "08:50", start: "08:50", nextStart: "09:45" },
+  { label: "09:50", start: "09:45", nextStart: "10:45" },
+  { label: "10:45", start: "10:45", nextStart: "11:45" },
+  { label: "11:50", start: "11:45", nextStart: "12:45" },
+  { label: "12:45", start: "12:45", nextStart: "13:45" },
+  { label: "13:50", start: "13:45", nextStart: "14:45" },
+  { label: "14:45", start: "14:45", nextStart: "15:35" },
+  { label: "15:35", start: "15:35", nextStart: "23:59" }
+];
+const AUTO_REFRESH_MS = 10 * 60 * 1000;
+let childrenList = [...FALLBACK_CHILDREN];
+let currentSlug = childrenList[0].slug;
+let weekOffset = 0;
+let showAllMessages = false;
+let isRefreshing = false;
+
+function unfoldIcs(text) { return text.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, ""); }
+function unescapeIcs(val) {
+  return (val || "").replace(/\\n/gi, "\n").replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\\\/g, "\\");
+}
+function fmtIsoDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function fmtDeDate(d) {
+  return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.`;
+}
+function getMonday(offsetWeeks) {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + offsetWeeks * 7);
+  return d;
+}
+function parseDtstart(raw) {
+  const m = (raw || "").trim().match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/);
+  if (!m) return null;
+  const [, y, mo, da, hh, mm] = m;
+  return { dateStr: `${y}-${mo}-${da}`, timeStr: hh ? `${hh}:${mm}` : null, allDay: !hh };
+}
+function isAllDayBanner(ev) {
+  if (ev._dt.allDay) return true;
+  return /polizeiworkshop/i.test(ev.SUMMARY || "");
+}
+function parseIcs(icsText) {
+  return unfoldIcs(icsText).split(/BEGIN:VEVENT/i).slice(1).map(b => {
+    const ev = {};
+    for (const line of b.split(/END:VEVENT/i)[0].split(/\r?\n/)) {
+      const idx = line.indexOf(":");
+      if (idx === -1) continue;
+      ev[line.slice(0, idx).split(";")[0].toUpperCase()] = unescapeIcs(line.slice(idx + 1).trim());
+    }
+    ev._dt = parseDtstart(ev.DTSTART);
+    return ev;
+  }).filter(ev => ev._dt);
+}
+function renderSlotHtml(ev, isHw = false, forceAllDayLabel = false, isExam = false) {
+  const rawSummary = ev.SUMMARY || "";
+  const summary = isExam && !/^\[Prüfung\]/i.test(rawSummary) ? `[Prüfung] ${rawSummary}` : rawSummary;
+  const isCancelled = ev.STATUS === "CANCELLED" || summary.startsWith("[ENTFALL]");
+  const isIrreg = summary.startsWith("[VERTRETUNG]");
+  const cls = isExam
+    ? "slot exam"
+    : isHw
+      ? `slot hw${summary.startsWith("[ERLEDIGT]") ? " cancelled" : ""}`
+      : `slot ${isCancelled ? "cancelled" : isIrreg ? "irreg" : ""}`;
+  const timeInfo = forceAllDayLabel || !ev._dt.timeStr ? "Ganztägig" : `${ev._dt.timeStr}`;
+  const roomInfo = ev.LOCATION ? ` · ${ev.LOCATION}` : "";
+  return `<div class="${cls}" title="${(ev.DESCRIPTION || "").replace(/"/g, "&quot;")}">
+    <div class="subj">${summary}</div>
+    <div class="meta">${timeInfo}${roomInfo}</div>
+  </div>`;
+}
+function buildWeekOrLeadSet(monday, currentWeekOffset) {
+  const set = new Set();
+  const startOffset = currentWeekOffset > 0 ? -2 : 0;
+  for (let i = startOffset; i <= 4; i++) {
+    const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    set.add(fmtIsoDate(d));
+  }
+  return set;
+}
+function extractTargetDates(msg) {
+  const haystack = `${msg.SUMMARY || ""}\n${msg.DESCRIPTION || ""}`;
+  const found = new Set();
+
+  const [sentY, sentM] = (msg._dt && msg._dt.dateStr ? msg._dt.dateStr : "2026-01-01")
+    .split("-")
+    .map(n => parseInt(n, 10));
+
+  function tryAddDate(day, month, year) {
+    if (month < 1 || month > 12 || day < 1 || day > 31) return;
+    const dtObj = new Date(year, month - 1, day);
+    if (
+      dtObj.getFullYear() === year &&
+      dtObj.getMonth() === month - 1 &&
+      dtObj.getDate() === day
+    ) {
+      found.add(fmtIsoDate(dtObj));
+    }
+  }
+
+  const datedRegex = /\b(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})\b/g;
+  let match;
+  while ((match = datedRegex.exec(haystack)) !== null) {
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    let year = parseInt(match[3], 10);
+    if (year < 100) year += 2000;
+    tryAddDate(day, month, year);
+  }
+
+  const shortRegex = /(?:^|[^\d.])(\d{1,2})\.(\d{1,2})\.(?!\s*\d)/g;
+  while ((match = shortRegex.exec(haystack)) !== null) {
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    let year = sentY;
+    if (sentM - month > 6) {
+      year = sentY + 1;
+    }
+    tryAddDate(day, month, year);
+  }
+
+  return Array.from(found);
+}
+function renderMsgCards(items) {
+  return items.map(m => {
+    const [y, mo, da] = m._dt.dateStr.split("-");
+    const timeSuffix = m._dt.timeStr ? ` ${m._dt.timeStr}` : "";
+    const targets = extractTargetDates(m);
+    const targetHint = targets.length
+      ? ` <span style="color:#c4b5fd;font-weight:500;">[Bezug: ${targets.map(t => t.split("-").reverse().join(".")).join(", ")}]</span>`
+      : "";
+    return `<div class="msg-item">
+      <div class="msg-head">${da}.${mo}.${y}${timeSuffix} – ${m.SUMMARY || "Mitteilung"}${targetHint}</div>
+      ${m.DESCRIPTION ? `<div class="msg-body">${m.DESCRIPTION}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+function renderMessages(msgEvents, monday, weekLabelText) {
+  const box = document.getElementById("msg-list");
+  const heading = document.getElementById("msg-heading");
+  const toggleBtn = document.getElementById("toggle-all-msgs");
+
+  const sortedAll = [...msgEvents].sort(
+    (a, b) => b._dt.dateStr.localeCompare(a._dt.dateStr) || (b._dt.timeStr || "").localeCompare(a._dt.timeStr || "")
+  );
+
+  if (showAllMessages) {
+    if (heading) heading.textContent = `Alle Mitteilungen (${sortedAll.length})`;
+    if (toggleBtn) toggleBtn.textContent = "Wochenansicht";
+    box.innerHTML = sortedAll.length
+      ? renderMsgCards(sortedAll)
+      : `<span class="status">Keine Mitteilungen vorhanden.</span>`;
+    return;
+  }
+
+  const activeSet = buildWeekOrLeadSet(monday, weekOffset);
+  const weekMatches = sortedAll.filter(ev => {
+    if (activeSet.has(ev._dt.dateStr)) return true;
+    return extractTargetDates(ev).some(isoDate => activeSet.has(isoDate));
+  });
+  const suffixLabel = weekOffset > 0 ? " (inkl. Fr–So Vorlauf)" : "";
+
+  if (heading) {
+    heading.textContent = `Mitteilungen der Woche ${weekLabelText}${suffixLabel} (${weekMatches.length})`;
+  }
+  if (toggleBtn) {
+    toggleBtn.textContent = `Alle anzeigen (${sortedAll.length})`;
+  }
+
+  if (weekMatches.length) {
+    box.innerHTML = renderMsgCards(weekMatches);
+    return;
+  }
+
+  const fallbackRecent = sortedAll.slice(0, 5);
+  if (!fallbackRecent.length) {
+    box.innerHTML = `<span class="status">Keine Mitteilungen vorhanden.</span>`;
+    return;
+  }
+  box.innerHTML =
+    `<span class="status">Keine direkten Einträge für diese Woche – hier die ${fallbackRecent.length} neuesten Mitteilungen:</span>` +
+    renderMsgCards(fallbackRecent);
+}
+function renderBoard(ttEvents, hwEvents, msgEvents, examEvents = []) {
+  const monday = getMonday(weekOffset);
+  const days = [0, 1, 2, 3, 4].map(i => {
+    const dtObj = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    return { iso: fmtIsoDate(dtObj), label: `${DAY_NAMES[i]} ${fmtDeDate(dtObj)}` };
+  });
+  const friday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 4);
+  document.getElementById("week-label").textContent = `${fmtDeDate(monday)} – ${fmtDeDate(friday)}${monday.getFullYear()}`;
+  const weekSet = new Set(days.map(d => d.iso));
+  const dayTt = Object.fromEntries(days.map(d => [d.iso, []]));
+  const dayAllDay = Object.fromEntries(days.map(d => [d.iso, []]));
+  for (const ev of ttEvents) {
+    if (!weekSet.has(ev._dt.dateStr)) continue;
+    if (isAllDayBanner(ev)) dayAllDay[ev._dt.dateStr].push(ev);
+    else dayTt[ev._dt.dateStr].push(ev);
+  }
+  const weekHw = hwEvents.filter(ev => weekSet.has(ev._dt.dateStr));
+  const weekExamForGrid = (examEvents || []).filter(ev => ev._dt && weekSet.has(ev._dt.dateStr));
+  let html = `<thead><tr><th class="time-col">Zeit</th>${days.map(d => `<th>${d.label}</th>`).join("")}</tr></thead><tbody>`;
+  html += `<tr class="allday-row"><td class="time-col">Ganztag</td>${days.map(d => {
+    const dayAllDayExams = weekExamForGrid.filter(ex => ex._dt.dateStr === d.iso && !ex._dt.timeStr);
+    const items = [
+      ...dayAllDay[d.iso].map(ev => renderSlotHtml(ev, false, true, false)),
+      ...dayAllDayExams.map(ex => renderSlotHtml(ex, false, true, true)),
+      ...weekHw.filter(h => h._dt.dateStr === d.iso).map(h => renderSlotHtml(h, true, false, false))
+    ];
+    return `<td>${items.join("")}</td>`;
+  }).join("")}</tr>`;
+  for (const slot of TIME_SLOTS) {
+    html += `<tr><td class="time-col">${slot.label}</td>`;
+    for (const d of days) {
+      const matching = dayTt[d.iso]
+        .filter(ev => ev._dt.timeStr && ev._dt.timeStr >= slot.start && ev._dt.timeStr < slot.nextStart)
+        .sort((a, b) => a._dt.timeStr.localeCompare(b._dt.timeStr));
+      const matchingExams = weekExamForGrid
+        .filter(ex => ex._dt.dateStr === d.iso && ex._dt.timeStr && ex._dt.timeStr >= slot.start && ex._dt.timeStr < slot.nextStart)
+        .sort((a, b) => a._dt.timeStr.localeCompare(b._dt.timeStr));
+      const cellHtml = [
+        ...matching.map(ev => renderSlotHtml(ev, false, false, false)),
+        ...matchingExams.map(ex => renderSlotHtml(ex, false, false, true))
+      ].join("");
+      html += `<td>${cellHtml}</td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</tbody>`;
+  document.getElementById("untis-grid").innerHTML = html;
+
+  const hwBox = document.getElementById("hw-week-list");
+  hwBox.innerHTML = !weekHw.length
+    ? `<span class="status">Keine Hausaufgaben in dieser Woche.</span>`
+    : weekHw.sort((a, b) => a._dt.dateStr.localeCompare(b._dt.dateStr)).map(h => {
+        const done = (h.SUMMARY || "").startsWith("[ERLEDIGT]");
+        return `<div class="hw-chip ${done ? "done" : ""}"><strong>${h._dt.dateStr.slice(5).split("-").reverse().join(".")}:</strong> ${h.SUMMARY || "Hausaufgabe"}</div>`;
+      }).join("");
+
+  const weekExam = (examEvents || []).filter(ev => ev._dt && weekSet.has(ev._dt.dateStr));
+  const examBox = document.getElementById("exam-week-list");
+  if (examBox) {
+    examBox.innerHTML = !weekExam.length
+      ? `<span class="status">Keine Prüfungen in dieser Woche.</span>`
+      : weekExam.sort((a, b) => a._dt.dateStr.localeCompare(b._dt.dateStr) || (a._dt.timeStr || "").localeCompare(b._dt.timeStr || "")).map(ex => {
+          const dtPart = ex._dt.dateStr ? ex._dt.dateStr.slice(5).split("-").reverse().join(".") : "";
+          const tmPart = ex._dt.timeStr ? ` ${ex._dt.timeStr}` : "";
+          const locPart = ex.LOCATION ? ` (${ex.LOCATION})` : "";
+          return `<div class="hw-chip"><strong>${dtPart}${tmPart}:</strong> ${ex.SUMMARY || "Prüfung"}${locPart}</div>`;
+        }).join("");
+  }
+
+  const weekLabelText = `${fmtDeDate(monday)} – ${fmtDeDate(friday)}${monday.getFullYear()}`;
+  renderMessages(msgEvents, monday, weekLabelText);
+}
+
+function renderChildTabs() {
+  const tabs = document.getElementById("child-tabs");
+  tabs.innerHTML = "";
+  for (const c of childrenList) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = c.name || c.slug;
+    b.dataset.slug = c.slug;
+    b.onclick = () => {
+      currentSlug = c.slug;
+      refresh();
+    };
+    tabs.appendChild(b);
+  }
+}
+
+async function loadChildrenManifest() {
+  try {
+    const res = await fetch(`/untis/children.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      childrenList = data
+        .filter(item => item && typeof item.slug === "string" && item.slug.trim())
+        .map(item => ({ slug: item.slug.trim(), name: (item.name || item.slug).trim() }));
+      if (!childrenList.length) childrenList = [...FALLBACK_CHILDREN];
+      if (!childrenList.some(c => c.slug === currentSlug)) {
+        currentSlug = childrenList[0].slug;
+      }
+    }
+  } catch (_) {
+    childrenList = [...FALLBACK_CHILDREN];
+    if (!childrenList.some(c => c.slug === currentSlug)) {
+      currentSlug = childrenList[0].slug;
+    }
+  }
+  renderChildTabs();
+}
+
+async function refresh() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+  document.querySelectorAll("#child-tabs button").forEach(b => b.classList.toggle("active", b.dataset.slug === currentSlug));
+  const combinedRel = `/untis/${currentSlug}_alle.ics`;
+  const linkEl = document.getElementById("combined-ics-link");
+  if (linkEl) {
+    linkEl.href = combinedRel;
+    linkEl.setAttribute("download", `${currentSlug}_alle.ics`);
+    linkEl.textContent = `${currentSlug}_alle.ics`;
+  }
+  document.getElementById("status-text").textContent = "Aktualisiere...";
+  try {
+    const [ttRes, hwRes, msgRes, examRes] = await Promise.all([
+      fetch(`/untis/${currentSlug}.ics?t=${Date.now()}`),
+      fetch(`/untis/${currentSlug}_hausaufgaben.ics?t=${Date.now()}`),
+      fetch(`/untis/${currentSlug}_mitteilungen.ics?t=${Date.now()}`),
+      fetch(`/untis/${currentSlug}_pruefungen.ics?t=${Date.now()}`)
+    ]);
+    if (!ttRes.ok) throw new Error(`HTTP ${ttRes.status}`);
+    renderBoard(
+      parseIcs(await ttRes.text()),
+      hwRes.ok ? parseIcs(await hwRes.text()) : [],
+      msgRes.ok ? parseIcs(await msgRes.text()) : [],
+      examRes.ok ? parseIcs(await examRes.text()) : []
+    );
+    document.getElementById("status-text").textContent = `Stand: ${new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`;
+  } catch (e) {
+    document.getElementById("status-text").textContent = `Fehler: ${e.message}`;
+  } finally {
+    isRefreshing = false;
+  }
+}
+
+document.getElementById("copy-ics-url")?.addEventListener("click", async () => {
+  const btn = document.getElementById("copy-ics-url");
+  const url = new URL(`/untis/${currentSlug}_alle.ics`, window.location.origin).href;
+  try {
+    await navigator.clipboard.writeText(url);
+    if (btn) {
+      const prev = btn.textContent;
+      btn.textContent = "Kopiert!";
+      setTimeout(() => { btn.textContent = prev || "URL kopieren"; }, 1500);
+    }
+  } catch (_) {
+    window.prompt("Kalender-Abo-URL:", url);
+  }
+});
+
+document.getElementById("prev-week").onclick = () => { weekOffset--; refresh(); };
+document.getElementById("this-week").onclick = () => { weekOffset = 0; refresh(); };
+document.getElementById("next-week").onclick = () => { weekOffset++; refresh(); };
+document.getElementById("toggle-all-msgs").onclick = () => { showAllMessages = !showAllMessages; refresh(); };
+
+setInterval(() => {
+  if (!document.hidden && !isRefreshing) {
+    refresh();
+  }
+}, AUTO_REFRESH_MS);
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !isRefreshing) {
+    refresh();
+  }
+});
+
+(async () => {
+  await loadChildrenManifest();
+  await refresh();
+})();
+</script>
+</body>
+</html>
