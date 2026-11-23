@@ -1,8 +1,6 @@
 {
   "google": {
-    "calendar_prefix": "WebUntis - ",
-    "credentials_file": "credentials.json",
-    "token_file": "token.json",
+    "service_account_file": "service-account.json",
     "delete_missing": true,
     "timezone": "Europe/Berlin"
   }
