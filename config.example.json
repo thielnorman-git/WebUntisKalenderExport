@@ -1,0 +1,37 @@
+{
+  "server": "schule.webuntis.com",
+  "user_agent": "UntisIcalExporter/1.0",
+  "timezone": "Europe/Berlin",
+  "weeks_ahead": 3,
+  "include_weeks_back": 6,
+  "mark_cancelled": true,
+  "skip_cancelled": false,
+  "output_dir": "/var/www/html/untis",
+
+  "children": [
+    {
+      "name": "Max Mustermann",
+      "slug": "max-mustermann",
+      "username": "USERNAME",
+      "password": "PASSWORD"
+    },
+    {
+      "name": "Erika Mustermann",
+      "slug": "erika-mustermann",
+      "username": "USERNAME",
+      "password": "PASSWORD"
+    }
+  ],
+
+  "children_other_school": [
+    {
+      "name": "Beispiel Kind",
+      "slug": "beispiel-kind",
+      "server": "andere-schule.webuntis.com",
+      "username": "USERNAME",
+      "password": "PASSWORD",
+      "element_type": 1,
+      "element_id": 12345
+    }
+  ]
+}
