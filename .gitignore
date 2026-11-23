@@ -1,6 +1,13 @@
 # Lokale Konfiguration
 config.json
 
+# Google OAuth
+credentials.json
+token.json
+
+# Beispiel-OAuth-Dateien nicht ignorieren
+!google_sync.example.json
+
 # Generierte Kalender
 *.ics
 
