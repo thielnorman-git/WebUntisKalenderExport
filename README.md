@@ -165,7 +165,9 @@ python3 untis_to_ical.py
 
 <p><strong>Installation</strong></p>
 
-<pre><code>pip install icalendar requests</code></pre>
+<pre><code>
+pip install -r requirements.txt
+</code></pre>
 
 <h3>Webserver</h3>
 
