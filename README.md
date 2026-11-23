@@ -161,6 +161,7 @@ python3 untis_to_ical.py
 <li>icalendar</li>
 <li>requests</li>
 <li>pytz</li>
+<li>Apache oder Nginx (optional für das Dashboard)</li>
 </ul>
 
 <p><strong>Installation</strong></p>
