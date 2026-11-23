@@ -1,0 +1,27 @@
+# Lokale Konfiguration
+config.json
+
+# Generierte Kalender
+*.ics
+
+# Logs
+*.log
+
+# Öffentlich generierte Profile
+children.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environments
+venv/
+.venv/
+
+# Umgebungsvariablen
+.env
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
