@@ -3,5 +3,6 @@
     "service_account_file": "service-account.json",
     "delete_missing": true,
     "timezone": "Europe/Berlin"
+    "owner": "IhreEmailAdresse@gmail.com"
   }
 }
