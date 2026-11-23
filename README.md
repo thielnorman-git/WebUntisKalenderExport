@@ -132,6 +132,19 @@ nicht mehrfach erscheinen.
 </p>
 
 <hr>
+<h2>🚀 Quick Start</h2>
+
+<pre><code>
+git clone https://github.com/thielnorman-git/WebUntisKalenderExport.git
+
+cd WebUntisKalenderExport
+
+pip install -r requirements.txt
+
+cp config.example.json config.json
+
+python3 untis_to_ical.py
+</code></pre>
 
 <h2>⚙️ Setup &amp; Berechtigungen</h2>
 
