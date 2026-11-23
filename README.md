@@ -160,7 +160,7 @@ python3 untis_to_ical.py
 <li>Python 3</li>
 <li>icalendar</li>
 <li>requests</li>
-<li>pytz/li>
+<li>pytz</li>
 </ul>
 
 <p><strong>Installation</strong></p>
