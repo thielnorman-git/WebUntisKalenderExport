@@ -864,7 +864,13 @@ def build_combined_calendar(
                 ev = component.copy()
                 if prefix and "SUMMARY" in ev:
                     summary_str = str(ev.get("SUMMARY", ""))
-                    if not summary_str.startswith(prefix):
+                    summary_norm = summary_str.lstrip().upper()
+                    prefix_norm = prefix.strip().upper()
+                    already_tagged = (
+                        summary_norm.startswith(prefix_norm)
+                        or summary_norm.startswith(("[PRÜFUNG]", "[PRUEFUNG]", "[HA]", "[INFO]", "[ENTFALL]", "[VERTRETUNG]"))
+                    )
+                    if not already_tagged:
                         ev["SUMMARY"] = f"{prefix}{summary_str}"
                 combined.add_component(ev)
 
