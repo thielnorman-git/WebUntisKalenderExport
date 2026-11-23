@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -269,10 +270,14 @@ def build_google_event(event):
     start = event.decoded("DTSTART")
     end = event.decoded("DTEND")
 
+    summary = str(
+        event.get("SUMMARY", "")
+    ).strip()
+
+    summary_upper = summary.upper()
+
     body = {
-        "summary": str(
-            event.get("SUMMARY", "")
-        ).strip(),
+        "summary": summary,
         "description": str(
             event.get("DESCRIPTION", "")
         ),
@@ -280,6 +285,25 @@ def build_google_event(event):
             event.get("LOCATION", "")
         )
     }
+
+    #
+    # Event-Farben
+    #
+    if summary_upper.startswith("[PRÜFUNG]"):
+
+        body["colorId"] = "5"   # Gelb
+
+    elif summary.startswith("[HA]"):
+
+        body["colorId"] = "10"  # Grün
+
+    elif summary_upper.startswith("[INFO]"):
+
+        body["colorId"] = "3"   # Lila
+
+    elif summary_upper.startswith("[ENTFALL]"):
+
+        body["colorId"] = "11"  # Rot
 
     if hasattr(start, "hour"):
 
@@ -411,7 +435,39 @@ def sync_child_calendar(
 
     for uid, event in ics_events.items():
 
-        google_id = uid.split("@")[0]
+        summary = str(
+            event.get("SUMMARY", "")
+        ).strip()
+
+        summary_upper = summary.upper()
+
+        event_prefix = "lesson"
+
+        if summary_upper.startswith("[HA]"):
+            event_prefix = "ha"
+
+        elif summary_upper.startswith("[INFO]"):
+            event_prefix = "info"
+
+        elif summary_upper.startswith("[PRÜFUNG]"):
+            event_prefix = "exam"
+
+        elif summary_upper.startswith("[ENTFALL]"):
+            event_prefix = "cancelled"
+
+        #
+        # Google Event IDs dürfen nur bestimmte Zeichen enthalten.
+        # Deshalb wird eine SHA1-ID erzeugt.
+        #
+        raw_id = (
+            f"{child_name}-"
+            f"{event_prefix}-"
+            f"{uid}"
+        )
+
+        google_id = hashlib.sha1(
+            raw_id.encode("utf-8")
+        ).hexdigest()
 
         active_google_ids.add(
             google_id
