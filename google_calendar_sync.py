@@ -41,7 +41,7 @@ TIMEZONE = GOOGLE_CFG.get(
 
 CALENDAR_PREFIX = "WebUntis - "
 
-GOOGLE_OWNER = "familie.thielowski@gmail.com"
+GOOGLE_OWNER = "Bitte EmailAdresse eintragen!"
 
 
 def execute_with_retry(
