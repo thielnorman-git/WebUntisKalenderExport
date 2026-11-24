@@ -369,9 +369,11 @@ Google Calendar API nicht zu überlasten.
 <h3>🕒 Cronjob</h3>
 
 <pre><code>
-*/20 * * * * /opt/untis-ical/venv/bin/python /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&1
+# 1. Schnell-Befehl via SSH (setzt/aktualisiert den Job und erhält andere Einträge)
+{ crontab -l 2>/dev/null | grep -vE 'untis_to_ical\.py|google_calendar_sync\.py'; echo '*/20 * * * * cd /opt/untis-ical && PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json /opt/untis-ical/venv/bin/python3 -u /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&1 && PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json /opt/untis-ical/venv/bin/python3 -u /opt/untis-ical/google_calendar_sync.py >> /opt/untis-ical/google-sync.log 2>&1'; } | crontab -
 
-*/25 * * * * /opt/untis-ical/venv/bin/python /opt/untis-ical/google_calendar_sync.py >> /opt/untis-ical/google-sync.log 2>&1
+# 2. Reine Zeile für crontab -e (alle 20 Minuten: erst iCal-Export, dann Google-Sync)
+*/20 * * * * cd /opt/untis-ical && PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json /opt/untis-ical/venv/bin/python3 -u /opt/untis-ical/untis_to_ical.py >> /opt/untis-ical/untis-ical.log 2>&1 && PYTHONPATH=/opt/untis-ical UNTIS_ICAL_CONFIG=/opt/untis-ical/config.json /opt/untis-ical/venv/bin/python3 -u /opt/untis-ical/google_calendar_sync.py >> /opt/untis-ical/google-sync.log 2>&1
 </code></pre>
 
 <h3>📱 Daely Integration</h3>
