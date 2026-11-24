@@ -2,7 +2,7 @@
 
 <p><strong>ICS-Export als Wochenplan für Familien und Eltern</strong></p>
 
-<h2>Untis iCal-Exporter &amp; Dashboard (v1.0.0)</h2>
+<h2>WebUntis iCal-Exporter &amp; Dashboard (v1.0.0)</h2>
 
 <p>
 Exportiert Stundenpläne, Hausaufgaben, Mitteilungen und Prüfungen aus WebUntis
