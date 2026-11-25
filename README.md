@@ -17,6 +17,7 @@ Web-Dashboard unter <code>/untis/</code> bereitgestellt. Hauptziel für Dienste 
 </p>
 
 <hr>
+<img width="800" height="1314" alt="image" src="https://github.com/user-attachments/assets/bbadbcf7-59b0-4beb-bc9d-080af195096f" />
 
 <h2>🚀 Features</h2>
 
